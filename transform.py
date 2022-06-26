@@ -90,7 +90,7 @@ for table in tables:
     elif table == "events":
         # Transformations
         df = df.select(md5(concat("group_id", "name")).alias("event_id"), "*") # Add id column based on group_id and name
-        df_fact_events = df.select("event_id", explode("rsvps").alias("struct")).select("event_id", "struct.*") # Create fact table: rsvps for events
+        df_fact_events = df.select("event_id", "group_id", "venue_id", explode("rsvps").alias("struct")).select("event_id", "group_id", "venue_id", "struct.*") # Create fact table: rsvps for events
         df_fact_events = unix_datetime(df_fact_events, "when") # Convert unix cols to datetime
         df = unix_datetime(df, ["created", "time"]) # base events: unix cols to datetime
         df = df.select("event_id", "name", "description", "group_id", "venue_id", "status", "duration", "rsvp_limit", "time", "created") # reorder columns and drop nested array
