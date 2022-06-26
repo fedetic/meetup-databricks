@@ -14,27 +14,6 @@ spark.conf.set("fs.azure.account.key.adlstdmeetup.dfs.core.windows.net", "54KYbL
 
 # COMMAND ----------
 
-# Set variables
-
-container_source = "raw"
-container_destination = "enriched"
-storage_account = "adlstdmeetup"
-tables = ["groups", "users", "events", "venues"]
-
-# COMMAND ----------
-
-# Create functions
-
-def unix_datetime(df, cols_unix):
-    if type(cols_unix) in (list, tuple):
-        for col_unix in cols_unix:
-            df = df.withColumn(col_unix, (col(col_unix)/1000).cast(TimestampType()))
-    else:
-        df = df.withColumn(cols_unix, (col(cols_unix)/1000).cast(TimestampType()))
-    return df
-
-# COMMAND ----------
-
  # Only needed in first run
 # # Mount /mnt/raw to raw container
 # dbutils.fs.mount(
@@ -47,6 +26,45 @@ def unix_datetime(df, cols_unix):
 #   source = f"wasbs://{container_destination}@{storage_account}.blob.core.windows.net",
 #   mount_point = "/mnt/enriched",
 #   extra_configs = {f"fs.azure.account.key.{storage_account}.blob.core.windows.net":"54KYbLx4u1h/tkbOlAGfamyLtUFgQFLvqPVKm5vlr0rSNUgyelx5gsGM6lIgLyqSedwVFV2zPtTC+AStqSoYBQ=="})
+
+# COMMAND ----------
+
+# MAGIC %md ### Set variables & params
+
+# COMMAND ----------
+
+# Set variables
+
+container_source = "raw"
+container_destination = "enriched"
+storage_account = "adlstdmeetup"
+tables = ["groups", "users", "events", "venues"]
+
+# COMMAND ----------
+
+# Create parameter - if we only want to run this script for a subset of tables
+
+dbutils.widgets.text("input", "","")
+y = dbutils.widgets.get("input").split(',')
+if len(y) > 0 and y[0] != '':
+    tables = y
+
+print(tables)
+
+# COMMAND ----------
+
+# MAGIC %md ### Create functions
+
+# COMMAND ----------
+
+# Convert unix cols in df to datetime
+def unix_datetime(df, cols_unix):
+    if type(cols_unix) in (list, tuple):
+        for col_unix in cols_unix:
+            df = df.withColumn(col_unix, (col(col_unix)/1000).cast(TimestampType()))
+    else:
+        df = df.withColumn(cols_unix, (col(cols_unix)/1000).cast(TimestampType()))
+    return df
 
 # COMMAND ----------
 
