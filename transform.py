@@ -66,6 +66,13 @@ def unix_datetime(df, cols_unix):
         df = df.withColumn(cols_unix, (col(cols_unix)/1000).cast(TimestampType()))
     return df
 
+# Check for duplicates
+def contains_duplicates(df):
+    if df.count() > df.distinct().count():
+        print(f'{table} contains duplicates!')
+    else:
+        print(f'All good, {table} has no duplicates')
+
 # COMMAND ----------
 
 # MAGIC %md
@@ -83,6 +90,9 @@ for table in tables:
         df_fact_groups = unix_datetime(df_fact_groups, "joined") # Convert unix cols to datetime
         df = df.select("user_id", "city", "country", "hometown") # base users: reorder columns and drop nested array
         
+        # Check for duplicates
+        contains_duplicates(df)
+        
         # Write to data lake
         df_fact_groups.write.mode("overwrite").parquet(f"/mnt/enriched/data/fact_groups")
         df.write.mode("overwrite").parquet(f"/mnt/enriched/data/dim_{table}")
@@ -94,6 +104,10 @@ for table in tables:
         df_fact_events = unix_datetime(df_fact_events, "when") # Convert unix cols to datetime
         df = unix_datetime(df, ["created", "time"]) # base events: unix cols to datetime
         df = df.select("event_id", "name", "description", "group_id", "venue_id", "status", "duration", "rsvp_limit", "time", "created") # reorder columns and drop nested array
+        df = df.dropDuplicates() # Drop at the end in case base events record contains different rsvps
+        
+        # Check for duplicates
+        contains_duplicates(df)
         
         # Write to data lake
         df_fact_events.write.mode("overwrite").parquet(f"/mnt/enriched/data/fact_events")
@@ -105,10 +119,17 @@ for table in tables:
         df = unix_datetime(df, "created") # base groups: unix cols to datetime
         df = df.select("group_id", "name", "description", "city", "lat", "lon", "link", "created") # reorder columns and drop nested array
         
+        # Check for duplicates
+        contains_duplicates(df)
+        
         # Write to data lake
         df_topics.write.mode("overwrite").parquet(f"/mnt/enriched/data/dim_topics")
         df.write.mode("overwrite").parquet(f"/mnt/enriched/data/dim_{table}")
         
     elif table == "venues":
         df = df.select("venue_id", "name", "city", "country", "lat", "lon") # reorder columns
+        
+        # Check for duplicates
+        contains_duplicates(df)
+        
         df.write.mode("overwrite").parquet(f"/mnt/enriched/data/dim_{table}")
