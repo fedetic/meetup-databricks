@@ -112,6 +112,12 @@ df_cities = spark.read.format("csv").load(f"/mnt/raw/external_data/{table_extern
 # Set dtypes
 df_cities = df_cities.select("city", col("lat2").cast("float"), col("lon2").cast("float"), "country", col("population_urban").cast("int"), col("population_municipal").cast("int"))
 
+# Remove duplicates
+df_c = df_cities.toPandas() # convert to pandas (easier to remove duplicates)
+df_c = df_c[df_c['population_urban'].notna()] # remove all records that don't have a population
+df_c = df_c.drop_duplicates(subset='city', keep="first")
+df_cities=spark.createDataFrame(df_c)
+
 # For each object (internal data) in ALDS, load and write as parquet to enriched. For groups and events, do some additional transformations
 for table in tables:
     df = spark.read.format("json").load(f"/mnt/raw/data/{table}/{table}.json")
