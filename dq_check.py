@@ -14,21 +14,6 @@ spark.conf.set("fs.azure.account.key.adlstdmeetup.dfs.core.windows.net", "54KYbL
 
 # COMMAND ----------
 
- # Only needed in first run
-# # Mount /mnt/raw to raw container
-# dbutils.fs.mount(
-#   source = f"wasbs://{container_source}@{storage_account}.blob.core.windows.net",
-#   mount_point = "/mnt/raw",
-#   extra_configs = {f"fs.azure.account.key.{storage_account}.blob.core.windows.net":"54KYbLx4u1h/tkbOlAGfamyLtUFgQFLvqPVKm5vlr0rSNUgyelx5gsGM6lIgLyqSedwVFV2zPtTC+AStqSoYBQ=="})
-
-# # Mount /mnt/enriched to enriched container
-# dbutils.fs.mount(
-#   source = f"wasbs://{container_destination}@{storage_account}.blob.core.windows.net",
-#   mount_point = "/mnt/enriched",
-#   extra_configs = {f"fs.azure.account.key.{storage_account}.blob.core.windows.net":"54KYbLx4u1h/tkbOlAGfamyLtUFgQFLvqPVKm5vlr0rSNUgyelx5gsGM6lIgLyqSedwVFV2zPtTC+AStqSoYBQ=="})
-
-# COMMAND ----------
-
 # MAGIC %md ### Set variables & params
 
 # COMMAND ----------
