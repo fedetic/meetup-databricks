@@ -9,11 +9,6 @@ from pyspark.sql.types import *
 
 # COMMAND ----------
 
-spark.conf.set("fs.azure.account.key.adlstdmeetup.dfs.core.windows.net", "54KYbLx4u1h/tkbOlAGfamyLtUFgQFLvqPVKm5vlr0rSNUgyelx5gsGM6lIgLyqSedwVFV2zPtTC+AStqSoYBQ==")
-# dbutils.fs.ls("abfss://raw@adlstdmeetup.dfs.core.windows.net/data")
-
-# COMMAND ----------
-
 # MAGIC %md ### Set variables & params
 
 # COMMAND ----------
